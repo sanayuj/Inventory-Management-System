@@ -28,7 +28,28 @@ function Dashboard() {
       console.error("Error fetching products:", error);
     }
   };
-  const handleEdit = async (id,value) => {
+  const handleEdit = async (values,{ resetForm }) => {
+   try {
+    if (!editingProduct) return;
+
+    const productId = editingProduct._id; 
+    
+    const res = await editProduct(productId, values); 
+    console.log(res);
+
+    if (res.data.success) {
+      toast.success("Product updated successfully");
+      fetchProducts(); 
+      resetForm(); 
+      setEditingProduct(null); 
+    } else {
+      toast.error("Failed to update product");
+    }
+  } catch (err) {
+    console.error(err);
+    toast.error("Error updating product");
+  }
+    
     
   };
 

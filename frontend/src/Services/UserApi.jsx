@@ -24,6 +24,6 @@ export const deleteProduct = (id) => {
 };
 
 
-export const editProduct=(id)=>{
-    return userInstance.patch(`/updateproduct/${id}`)
+export const editProduct=(id,values)=>{
+    return userInstance.put(`/updateproduct/${id}`,{...values})
 }

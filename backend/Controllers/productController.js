@@ -86,4 +86,50 @@ const deleteProduct = async (req, res) => {
   }
 };
 
-module.exports = { getAllProducts, createProduct, deleteProduct };
+
+// Update a product by ID
+const updateProduct = async (req, res) => {
+  try {
+    const productId = req.params.id; // get product ID from URL
+    const { name, category, price, quantity } = req.body;
+
+    // Validate required fields
+    if (!name || !category || price == null || quantity == null) {
+      return res.status(400).json({
+        success: false,
+        message: "All fields are required",
+      });
+    }
+
+    // Find product and update
+    const updatedProduct = await Product.findByIdAndUpdate(
+      productId,
+      { name, category, price, quantity },
+      { new: true } // return updated document
+    );
+
+    if (!updatedProduct) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Product updated successfully",
+      data: updatedProduct,
+    });
+  } catch (error) {
+    console.error("Error updating product:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};
+
+
+
+module.exports = { getAllProducts, createProduct, deleteProduct,updateProduct };
