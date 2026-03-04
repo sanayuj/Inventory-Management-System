@@ -1,0 +1,23 @@
+.edit-btn, .delete-btn {
+  width: 35px;
+  height: 35px;
+  display: table-column;
+
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  border-radius: 50%;
+  transition: transform 0.2s;
+}
+
+.edit-btn:hover {
+  background-color: #0d6efd; /* darker blue */
+  transform: scale(1.1);
+  color: #fff;
+}
+
+.delete-btn:hover {
+  background-color: #dc3545; /* darker red */
+  transform: scale(1.1);
+  color: #fff;
+}
