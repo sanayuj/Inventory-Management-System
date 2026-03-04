@@ -1,28 +1,49 @@
-const jwt = require('jsonwebtoken')
-const userModel=require("../Model/user")
+const jwt = require("jsonwebtoken");
+const userModel = require("../Model/user");
 
 module.exports = async (req, res, next) => {
-  console.log("Admmin")
+  console.log("Admin middleware running");
+
   try {
-    const authHeader = req.headers.authorization
-    console.log(authHeader,"AU")
-    const authtoken = authHeader.replace(/^Bearer\s+/i, '');
-    console.log(authtoken,"AUUTH")
-    //if there is no token
-    if (!authtoken) return res.json({ loginfail: true, status: false, message: "NO auth token" })
+    // Get token from cookie
+    const token = req.cookies?.token; // requires cookie-parser
+    console.log(token, "TOKEN from cookie");
 
-    //decodin the token
-    const decoded = jwt.verify(authtoken, process.env.JWT_SECRETE_KEY)
-    //checking whether user exist or not
-    const admin = await userModel.findOne({ _id: decoded.id })
-    console.log(admin,"USer")
-    if (!admin) return res.json({ loginfail: true, status: false, message: "Unauthorized token" })
-    req.admin = admin
+    if (!token) {
+      return res.status(401).json({
+        loginfail: true,
+        status: false,
+        message: "No auth token",
+      });
+    }
 
-    next()
+    // Decode and verify JWT
+    const decoded = jwt.verify(token, process.env.JWT_SECRETE_KEY);
+    console.log(decoded, "Decoded JWT");
 
+    // Check if user exists
+    const admin = await userModel.findById(decoded.id);
+    if (!admin) {
+      return res.status(401).json({
+        loginfail: true,
+        status: false,
+        message: "Unauthorized token",
+      });
+    }
+
+    // Attach user to request object
+    req.admin = admin;
+    next();
   } catch (error) {
-    console.log(error,"Err")
-    return res.json({ loginfail: true, status: false, message: "Unauthorized" })
+    console.error(error, "Auth middleware error");
+
+    // Clear invalid token from cookies (optional)
+    res.clearCookie("token");
+
+    return res.status(401).json({
+      loginfail: true,
+      status: false,
+      message: "Unauthorized",
+    });
   }
-}
+};
