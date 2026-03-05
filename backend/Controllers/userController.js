@@ -10,11 +10,9 @@ const createToken = (id) => {
 
 const userLogin = async (req, res) => {
   try {
-    console.log("controller!!!", req.body);
 
     const { email, password } = req.body;
 
-    // check user exists
     const user = await User.findOne({ email });
     console.log(user);
 
@@ -24,7 +22,6 @@ const userLogin = async (req, res) => {
       });
     }
 
-    // compare password
     const isMatch = await bcrypt.compare(password, user.password);
     console.log(isMatch);
 
@@ -34,7 +31,6 @@ const userLogin = async (req, res) => {
       });
     }
 
-    // generate JWT token
     const token = createToken(user._id);
 
     console.log(token, "#####");
@@ -63,49 +59,39 @@ const userLogin = async (req, res) => {
   }
 };
 
-
-
 const logoutUser = async (req, res) => {
   try {
     res.clearCookie("token", {
       httpOnly: true,
-      secure: true,       
-      sameSite: "strict"
+      secure: true,
+      sameSite: "strict",
     });
 
     return res.status(200).json({
       success: true,
-      message: "User logged out successfully"
+      message: "User logged out successfully",
     });
-
   } catch (error) {
     return res.status(500).json({
       success: false,
       message: "Logout failed",
-      error: error.message
+      error: error.message,
     });
   }
 };
 
-
-const checkAuthUser=async(req,res)=>{
+const checkAuthUser = async (req, res) => {
   try {
-  const token = req.cookies.token;
+    const token = req.cookies.token;
 
-  if (!token) {
-    return res.status(401).json({ sucess:false,message: "Unauthorized" });
-  }
+    if (!token) {
+      return res.status(401).json({ sucess: false, message: "Unauthorized" });
+    }
 
-  return res.status(200).json({sucess:true, message: "Authenticated" });
-    
+    return res.status(200).json({ sucess: true, message: "Authenticated" });
   } catch (error) {
     console.log(error);
-    
   }
-}
+};
 
-
-
-
-
-module.exports = { userLogin,logoutUser,checkAuthUser };
+module.exports = { userLogin, logoutUser, checkAuthUser };

@@ -5,10 +5,16 @@ const auth = require("../Middleware/auth");
 const router=require("express").Router()
 
 router.post("/login",userLogin)
-router.get("/fetchAllProduct",auth ,getAllProducts)
-router.post("/addproduct",auth,createProduct)
-router.delete("/deleteproduct/:id",auth,deleteProduct)
-router.put("/updateproduct/:id",auth,updateProduct)
 router.post("/logout",logoutUser)
+router.post("/addproduct",auth,createProduct)
+
+
+router.get("/fetchAllProduct",auth ,getAllProducts)
 router.get("/checkAuth",checkAuthUser)
+
+router.delete("/deleteproduct/:id",auth,deleteProduct)
+
+router.put("/updateproduct/:id",auth,updateProduct)
+
+
 module.exports = router;

@@ -5,7 +5,6 @@ function LoginPage() {
   return (
     <div>
       <Login />
-      <p>HIHIHIHIHIHI</p>
     </div>
   );
 }

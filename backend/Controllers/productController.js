@@ -3,7 +3,6 @@ const Product = require("../Model/product");
 const getAllProducts = async (req, res) => {
   try {
     const products = await Product.find();
-
     res.status(200).json(products);
   } catch (error) {
     res.status(500).json({
@@ -17,7 +16,6 @@ const createProduct = async (req, res) => {
   try {
     const { name, category, price, quantity } = req.body;
 
-    // Basic validation
     if (!name || !category || price === undefined || quantity === undefined) {
       return res.status(400).json({
         message: "All fields are required",
@@ -87,13 +85,13 @@ const deleteProduct = async (req, res) => {
 };
 
 
-// Update a product by ID
+
 const updateProduct = async (req, res) => {
   try {
-    const productId = req.params.id; // get product ID from URL
+    const productId = req.params.id; 
     const { name, category, price, quantity } = req.body;
 
-    // Validate required fields
+
     if (!name || !category || price == null || quantity == null) {
       return res.status(400).json({
         success: false,
@@ -101,11 +99,11 @@ const updateProduct = async (req, res) => {
       });
     }
 
-    // Find product and update
+
     const updatedProduct = await Product.findByIdAndUpdate(
       productId,
       { name, category, price, quantity },
-      { new: true } // return updated document
+      { new: true } 
     );
 
     if (!updatedProduct) {

@@ -143,9 +143,13 @@ function Dashboard() {
 
   return (
     <div>
-      <button onClick={logout}>Logout</button>
+      <div className="dashboard-header">
+  <h2>Product Dashboard</h2>
+  <button className="btn btn-danger logout-btn" onClick={logout}>
+    Logout
+  </button>
+</div>
       <div style={{ padding: "20px" }}>
-        <h2>Product Dashboard</h2>
 
         <button
           className="btn btn-primary mb-3"
