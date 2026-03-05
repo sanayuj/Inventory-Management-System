@@ -1,10 +1,12 @@
 import React from "react";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   addProduct,
   deleteProduct,
   editProduct,
   getProduct,
+  logoutUser,
 } from "../../Services/UserApi";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
@@ -13,6 +15,7 @@ import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { toast } from "react-toastify";
 import "./Dashboard.css";
 function Dashboard() {
+   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [editingProduct, setEditingProduct] = useState(null);
 
@@ -52,6 +55,16 @@ function Dashboard() {
     
     
   };
+
+  const logout=async()=>{
+const res=await logoutUser()
+if(res.data.success){
+  toast.success("Logout")
+  navigate("/")
+}else{
+  toast.error("Unable logout")
+}
+  }
 
   const handleDelete = async (id) => {
     const confirmed = window.confirm(
@@ -117,6 +130,7 @@ function Dashboard() {
 
   return (
     <div>
+    <button onClick={logout}>Logout</button>
       <div style={{ padding: "20px" }}>
         <h2>Product Dashboard</h2>
 
@@ -139,42 +153,46 @@ function Dashboard() {
             </tr>
           </thead>
 
-          <tbody>
-            {products.length > 0 ? (
-              products.map((product) => (
-                <tr key={product._id}>
-                  <td>{product.name}</td>
-                  <td>{product.category}</td>
-                  <td>₹ {product.price}</td>
-                  <td>{product.quantity}</td>
-                  <td>
-                    <button
-                      className="btn btn-sm btn-primary me-2"
-                       data-bs-toggle="modal"
-          data-bs-target="#editProductModal"
-                      onClick={() => {
-                        setEditingProduct(product); 
-                      }}
-                    >
-                      <FontAwesomeIcon icon={faEdit} />
-                    </button>
-                    <button
-                      className="btn btn-sm btn-danger delete-btn"
-                      onClick={() => handleDelete(product._id)}
-                    >
-                      <FontAwesomeIcon icon={faTrash} />
-                    </button>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="4" style={{ textAlign: "center" }}>
-                  No products found
-                </td>
-              </tr>
-            )}
-          </tbody>
+         <tbody>
+  {products.length > 0 ? (
+    products.map((product) => (
+      <tr
+        key={product._id}
+        style={{
+          backgroundColor: product.quantity < 10 ? "#e35c0e" : "transparent", // light yellow for low stock
+        }}
+        className={product.quantity < 10 ? "low-stock" : ""}
+      >
+        <td>{product.name}</td>
+        <td>{product.category}</td>
+        <td>₹ {product.price}</td>
+        <td>{product.quantity}</td>
+        <td>
+          <button
+            className="btn btn-sm btn-primary me-2"
+            data-bs-toggle="modal"
+            data-bs-target="#editProductModal"
+            onClick={() => setEditingProduct(product)}
+          >
+            <FontAwesomeIcon icon={faEdit} />
+          </button>
+          <button
+            className="btn btn-sm btn-danger delete-btn"
+            onClick={() => handleDelete(product._id)}
+          >
+            <FontAwesomeIcon icon={faTrash} />
+          </button>
+        </td>
+      </tr>
+    ))
+  ) : (
+    <tr>
+      <td colSpan="5" style={{ textAlign: "center" }}>
+        No products found
+      </td>
+    </tr>
+  )}
+</tbody>
         </table>
       </div>
       {/* edit modal */}
@@ -389,6 +407,7 @@ function Dashboard() {
           </div>
         </div>
       </div>
+      
     </div>
   );
 }
