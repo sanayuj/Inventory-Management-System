@@ -88,7 +88,24 @@ const logoutUser = async (req, res) => {
 };
 
 
+const checkAuthUser=async(req,res)=>{
+  try {
+  const token = req.cookies.token;
+
+  if (!token) {
+    return res.status(401).json({ sucess:false,message: "Unauthorized" });
+  }
+
+  return res.status(200).json({sucess:true, message: "Authenticated" });
+    
+  } catch (error) {
+    console.log(error);
+    
+  }
+}
 
 
 
-module.exports = { userLogin,logoutUser };
+
+
+module.exports = { userLogin,logoutUser,checkAuthUser };

@@ -31,3 +31,7 @@ export const editProduct=(id,values)=>{
 export const logoutUser=()=>{
     return userInstance.post("/logout")
 }
+
+export const checkAuthUser=()=>{
+    return userInstance.get("/checkAuth",{withCredentials: true})
+}

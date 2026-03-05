@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   addProduct,
+  checkAuthUser,
   deleteProduct,
   editProduct,
   getProduct,
@@ -15,12 +16,26 @@ import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { toast } from "react-toastify";
 import "./Dashboard.css";
 function Dashboard() {
-   const navigate = useNavigate();
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [editingProduct, setEditingProduct] = useState(null);
 
+  const checkAuth = async () => {
+    try {
+      const res = await checkAuthUser();
+      console.log(res.data, "###");
+
+      if (!res.data.sucess) {
+        navigate("/");
+      }
+    } catch (err) {
+      console.log(err);
+      navigate("/");
+    }
+  };
   useEffect(() => {
     fetchProducts();
+    checkAuth();
   }, []);
 
   const fetchProducts = async () => {
@@ -31,40 +46,38 @@ function Dashboard() {
       console.error("Error fetching products:", error);
     }
   };
-  const handleEdit = async (values,{ resetForm }) => {
-   try {
-    if (!editingProduct) return;
+  const handleEdit = async (values, { resetForm }) => {
+    try {
+      if (!editingProduct) return;
 
-    const productId = editingProduct._id; 
-    
-    const res = await editProduct(productId, values); 
-    console.log(res);
+      const productId = editingProduct._id;
 
-    if (res.data.success) {
-      toast.success("Product updated successfully");
-      fetchProducts(); 
-      resetForm(); 
-      setEditingProduct(null); 
-    } else {
-      toast.error("Failed to update product");
+      const res = await editProduct(productId, values);
+      console.log(res);
+
+      if (res.data.success) {
+        toast.success("Product updated successfully");
+        fetchProducts();
+        resetForm();
+        setEditingProduct(null);
+      } else {
+        toast.error("Failed to update product");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Error updating product");
     }
-  } catch (err) {
-    console.error(err);
-    toast.error("Error updating product");
-  }
-    
-    
   };
 
-  const logout=async()=>{
-const res=await logoutUser()
-if(res.data.success){
-  toast.success("Logout")
-  navigate("/")
-}else{
-  toast.error("Unable logout")
-}
-  }
+  const logout = async () => {
+    const res = await logoutUser();
+    if (res.data.success) {
+      toast.success("Logout");
+      navigate("/");
+    } else {
+      toast.error("Unable logout");
+    }
+  };
 
   const handleDelete = async (id) => {
     const confirmed = window.confirm(
@@ -130,7 +143,7 @@ if(res.data.success){
 
   return (
     <div>
-    <button onClick={logout}>Logout</button>
+      <button onClick={logout}>Logout</button>
       <div style={{ padding: "20px" }}>
         <h2>Product Dashboard</h2>
 
@@ -153,46 +166,47 @@ if(res.data.success){
             </tr>
           </thead>
 
-         <tbody>
-  {products.length > 0 ? (
-    products.map((product) => (
-      <tr
-        key={product._id}
-        style={{
-          backgroundColor: product.quantity < 10 ? "#e35c0e" : "transparent", // light yellow for low stock
-        }}
-        className={product.quantity < 10 ? "low-stock" : ""}
-      >
-        <td>{product.name}</td>
-        <td>{product.category}</td>
-        <td>₹ {product.price}</td>
-        <td>{product.quantity}</td>
-        <td>
-          <button
-            className="btn btn-sm btn-primary me-2"
-            data-bs-toggle="modal"
-            data-bs-target="#editProductModal"
-            onClick={() => setEditingProduct(product)}
-          >
-            <FontAwesomeIcon icon={faEdit} />
-          </button>
-          <button
-            className="btn btn-sm btn-danger delete-btn"
-            onClick={() => handleDelete(product._id)}
-          >
-            <FontAwesomeIcon icon={faTrash} />
-          </button>
-        </td>
-      </tr>
-    ))
-  ) : (
-    <tr>
-      <td colSpan="5" style={{ textAlign: "center" }}>
-        No products found
-      </td>
-    </tr>
-  )}
-</tbody>
+          <tbody>
+            {products.length > 0 ? (
+              products.map((product) => (
+                <tr
+                  key={product._id}
+                  style={{
+                    backgroundColor:
+                      product.quantity < 10 ? "#e35c0e" : "transparent", // light yellow for low stock
+                  }}
+                  className={product.quantity < 10 ? "low-stock" : ""}
+                >
+                  <td>{product.name}</td>
+                  <td>{product.category}</td>
+                  <td>₹ {product.price}</td>
+                  <td>{product.quantity}</td>
+                  <td>
+                    <button
+                      className="btn btn-sm btn-primary me-2"
+                      data-bs-toggle="modal"
+                      data-bs-target="#editProductModal"
+                      onClick={() => setEditingProduct(product)}
+                    >
+                      <FontAwesomeIcon icon={faEdit} />
+                    </button>
+                    <button
+                      className="btn btn-sm btn-danger delete-btn"
+                      onClick={() => handleDelete(product._id)}
+                    >
+                      <FontAwesomeIcon icon={faTrash} />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="5" style={{ textAlign: "center" }}>
+                  No products found
+                </td>
+              </tr>
+            )}
+          </tbody>
         </table>
       </div>
       {/* edit modal */}
@@ -407,7 +421,6 @@ if(res.data.success){
           </div>
         </div>
       </div>
-      
     </div>
   );
 }
