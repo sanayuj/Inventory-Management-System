@@ -10,7 +10,7 @@ export const addProduct = (values) => {
 
 export const logoutUser = () => {
   return userInstance.post("/logout");
-};
+}
 
 
 export const getProduct = () => {
